@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotFlow Host - Autenticación</title>
+    <!-- Importamos fuentes modernas y un pack de iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #090d16;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --primary-glow: #25d366; /* Verde WhatsApp */
+            --primary-blue: #00e5ff; /* Toque tecnológico */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 211, 102, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 229, 255, 0.05) 0px, transparent 50%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Contenedor principal de la tarjeta */
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            z-index: 10;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+                        0 0 50px rgba(37, 211, 102, 0.03);
+        }
+
+        /* Encabezado del Host */
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo {
+            color: var(--primary-glow);
+            font-size: 28px;
+            filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.5));
+        }
+
+        .brand-name {
+            color: var(--text-primary);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-name span {
+            color: var(--primary-glow);
+        }
+
+        /* Pestañas de Login y Registro */
+        .tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Formularios */
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px 14px 48px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary-glow);
+            background: rgba(37, 211, 102, 0.02);
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.1);
+        }
+
+        .input-wrapper input:focus + i {
+            color: var(--primary-glow);
+        }
+
+        /* Botón de Acción */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #128c7e, #25d366);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.25);
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(37, 211, 102, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Capa del Reproductor de Video */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .video-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ajusta a 'cover' si quieres que llene toda la pantalla sin bordes negros */
+        }
+
+        /* Botón opcional para cerrar el video y volver */
+        .close-video-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 110;
+        }
+
+        .close-video-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tarjeta de Login / Registro -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-card">
+            <!-- Logo estilo Host de WhatsApp Bots -->
+            <div class="brand">
+                <i class="fa-brands fa-whatsapp brand-logo"></i>
+                <div class="brand-name">BOTFLOW<span>HOST</span></div>
+            </div>
+
+            <!-- Navegación entre Formularios -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
+                <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="form-content active" onsubmit="handleAuth(event)">
+                <div class="input-group">
+                    <label>Usuario / Email</label>
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="Tu usuario o correo" required>
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" placeholder="••••••••" required>
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span>Entrar al Panel</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </form>
+
+            <!-- Formulario de Registro -->
+            <form id="registerForm" class="form-content" onsubmit="handleAuth(event)">
+                <div class="input-group">
+                    <label>Nombre de Usuario</label>
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="Ej. bot_master" required>
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <input type="email" placeholder="ejemplo@dominio.com" required>
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" placeholder="Crea una contraseña" required>
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span>Registrarse</span>
+                    <i class="fa-solid fa-user-check"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pantalla de Video Fullscreen -->
+    <div class="video-overlay" id="videoOverlay">
+        <button class="close-video-btn" onclick="closeVideo()"><i class="fa-solid fa-xmark"></i> Salir del Video</button>
+        <video id="authVideo" playsinline>
+            <source src="https://cdn.discordapp.com/attachments/1524918945646379095/1527057292879597719/8ed8291585e8.mp4?ex=6a59466d&is=6a57f4ed&hm=b199e17f7e15e1384fda2b03b71014828ca1f1fe5d004b14bb3811563640a5bd&" type="video/mp4">
+            Tu navegador no soporta reproducción de videos HTML5.
+        </video>
+    </div>
+
+    <script>
+        // Función para cambiar de pestaña (Login / Registro)
+        function switchTab(type) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            if (type === 'login') {
+                tabs[0].classList.add('active');
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+            } else {
+                tabs[1].classList.add('active');
+                registerForm.classList.add('active');
+                loginForm.classList.remove('active');
+            }
+        }
+
+        // Manejador del submit de los formularios
+        function handleAuth(event) {
+            event.preventDefault(); // Evitamos que la página se recargue
+
+            const authContainer = document.getElementById('authContainer');
+            const videoOverlay = document.getElementById('videoOverlay');
+            const video = document.getElementById('authVideo');
+
+            // 1. Efecto de salida para el formulario
+            authContainer.style.opacity = '0';
+            authContainer.style.transform = 'scale(0.95)';
+
+            setTimeout(() => {
+                authContainer.style.display = 'none';
+                
+                // 2. Mostrar contenedor del video con transición suave
+                videoOverlay.style.display = 'flex';
+                setTimeout(() => {
+                    videoOverlay.classList.add('show');
+                    // 3. Reproducir video
+                    video.play().catch(error => {
+                        console.log("La reproducción automática puede requerir interacción previa del usuario:", error);
+                    });
+                }, 50);
+
+            }, 500); // Sincronizado con la duración del fadeout CSS
+        }
+
+        // Función para regresar al Login (opcional)
+        function closeVideo() {
+            const authContainer = document.getElementById('authContainer');
+            const videoOverlay = document.getElementById('videoOverlay');
+            const video = document.getElementById('authVideo');
+
+            video.pause();
+            video.currentTime = 0;
+
+            videoOverlay.classList.remove('show');
+            setTimeout(() => {
+                videoOverlay.style.display = 'none';
+                authContainer.style.display = 'block';
+                setTimeout(() => {
+                    authContainer.style.opacity = '1';
+                    authContainer.style.transform = 'scale(1)';
+                }, 50);
+            }, 800);
+        }
+    </script>
+</body>
+  </html>
